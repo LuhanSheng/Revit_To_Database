@@ -236,6 +236,7 @@ namespace Window
                 Pen p = new Pen(b, 1);
 
                 List draw = new List();
+                draw.Add(survey_point);
                 double r_lat_big = -200;
                 double r_long_big = -200;
                 double r_lat_small = 200;
@@ -276,27 +277,58 @@ namespace Window
                 double long_difference = r_long_big - r_long_small;
                 double a1;
                 double b1;
+                double b2;
                 if (lat_difference > long_difference)
                 {
-                    a1 = 1000 / lat_difference;
+                    a1 = 900 / lat_difference;
+                    Console.WriteLine("a1:" + a1);
                     b1 = -(a1 * r_lat_small);
+                    Console.WriteLine("b1:" + b1);
+                    b2 = -(a1 * r_long_small);
+                    Console.WriteLine("b1:" + b2);
+                    foreach (List poi in draw)
+                    {
+                        double y = 1000 - ((double)poi[0] * a1 + b1 + 50);
+                        double x = (double)poi[1] * a1 + b2 + 50;
+                        System.Drawing.Rectangle rec = new System.Drawing.Rectangle((int)x - 4, (int)y - 4, 8, 8);
+                        Console.WriteLine((int)x);
+                        Console.WriteLine((int)y);
+                        graphics.FillRectangle(b, rec);
+                    }
+                    double y_base = 1000 - ((double)survey_point[0] * a1 + b2 + 50);
+                    double x_base = (double)survey_point[1] * a1 + b1 + 50;
+                    Brush r = new SolidBrush(System.Drawing.Color.Red);
+                    System.Drawing.Rectangle rec_base = new System.Drawing.Rectangle((int)x_base - 8, (int)y_base - 8, 16, 16);
+                    graphics.FillRectangle(r, rec_base);
                 }
                 else
                 {
-                    a1 = 1000 / long_difference;
+                    a1 = 900 / long_difference;
+                    Console.WriteLine("a1:" + a1);
                     b1 = -(a1 * r_long_small);
+                    Console.WriteLine("b1:" + b1);
+                    b2 = -(a1 * r_lat_small);
+                    Console.WriteLine("b1:" + b2);
+                    foreach (List poi in draw)
+                    {
+                        double y = 1000- ((double)poi[0] * a1 + b2 + 50);
+                        double x = (double)poi[1] * a1 + b1 + 50;
+                        System.Drawing.Rectangle rec = new System.Drawing.Rectangle((int)x - 4, (int)y - 4, 8, 8);
+                        Console.WriteLine((int)x);
+                        Console.WriteLine((int)y);
+                        graphics.FillRectangle(b, rec);
+                    }
+                    double y_base = 1000 - ((double)survey_point[0] * a1 + b2 + 50);
+                    double x_base = (double)survey_point[1]* a1 + b1 + 50;
+                    Console.WriteLine("x_base:" + x_base);
+                    Console.WriteLine("y_base:" + y_base);
+                    Brush r = new SolidBrush(System.Drawing.Color.Red);
+                    System.Drawing.Rectangle rec_base = new System.Drawing.Rectangle((int)x_base - 8, (int)y_base - 8, 16, 16);
+                    graphics.FillRectangle(r, rec_base);
                 }
-                foreach (List poi in draw)
-                {
-                    double x = (double)poi[0] * a1 + b1;
-                    double y = (double)poi[1] * a1 + b1;
-                    System.Drawing.Rectangle rec = new System.Drawing.Rectangle((int)x - 2, (int)y - 2, 4, 4);
-                    Console.WriteLine((int)x);
-                    Console.WriteLine((int)y);
-                    graphics.FillRectangle(b, rec);
-                }
+                
                 Console.WriteLine("=======================================================");
-                myimage.Save(building_name + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+                myimage.Save("..\\..\\..\\images/" + building_name + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
 
                 MySqlCommand cmd = new MySqlCommand(sql_insert, conn);
                 int result = cmd.ExecuteNonQuery();
