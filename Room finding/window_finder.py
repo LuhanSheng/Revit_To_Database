@@ -7,6 +7,8 @@
 # # print(math.pi)
 # # print(sys.path)
 import pymysql
+import sys
+print(str(sys.argv))
 
 # tolerance unit: meter
 tolerance = 10
