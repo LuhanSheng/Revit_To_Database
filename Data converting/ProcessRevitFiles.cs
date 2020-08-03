@@ -141,6 +141,25 @@ namespace Window
 
             var windows = windowCollector.OfCategory(BuiltInCategory.OST_Windows).OfClass(typeof(FamilyInstance)).ToArray();
             Console.WriteLine(windows);
+
+            FilteredElementCollector levelCollector = new FilteredElementCollector(doc);
+            var levels = levelCollector.OfClass(typeof(Level)).ToArray();
+            double elevation = (double)bias[2];
+            foreach (Level l in levels)
+            {
+                Console.WriteLine(l.Elevation);
+                Console.WriteLine(l.Name);
+                int floor_number = obj.getDigit(l.Name);
+                Console.WriteLine(floor_number);
+                if (floor_number == 1)
+                {
+                    elevation = l.Elevation;
+                }
+            }
+            Console.WriteLine(elevation);
+            double first_floor_height = elevation - (double)bias[2];
+            Console.WriteLine(first_floor_height);
+
             List<List> windowData = new List<List>();
             foreach (FamilyInstance window in windows)
             {
@@ -174,7 +193,8 @@ namespace Window
                 windowLocations.Add(result.Name);
                 windowLocations.Add(windowLocationXyz.X);
                 windowLocations.Add(windowLocationXyz.Y);
-                windowLocations.Add(windowLocationXyz.Z);
+
+                windowLocations.Add(windowLocationXyz.Z - first_floor_height);
                 windowData.Add(windowLocations);
             }
             /*
