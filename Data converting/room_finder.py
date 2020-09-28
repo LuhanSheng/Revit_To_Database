@@ -218,8 +218,7 @@ def getCoordinate(survey_point, target_point, bias):
 
         y = abs((1 / math.tan(angle) * target_point[0] + target_point[1]) / ((1 + (1 / math.tan(angle)) ** 2) ** 0.5))
         x = abs((-math.tan(angle) * target_point[0] + target_point[1]) / ((1 + math.tan(angle) ** 2) ** 0.5))
-        print(x_xlxc,y_xlxc)
-        print(x, y)
+
         if y_xlxc >= 0 and x_xlxc >= 0:
             base_x = x
             base_y = y
@@ -239,8 +238,7 @@ def getCoordinate(survey_point, target_point, bias):
 
         x = abs((1 / math.tan(angle) * target_point[0] + target_point[1]) / ((1 + (1 / math.tan(angle)) ** 2) ** 0.5))
         y = abs((-math.tan(angle) * target_point[0] + target_point[1]) / ((1 + math.tan(angle) ** 2) ** 0.5))
-        print(x_xlxc,y_xlxc)
-        print(x, y)
+
         if y_xlxc >= 0 and x_xlxc >= 0:
             base_x = x
             base_y = y
@@ -260,8 +258,7 @@ def getCoordinate(survey_point, target_point, bias):
 
         y = abs((1 / math.tan(angle) * target_point[0] + target_point[1]) / ((1 + (1 / math.tan(angle)) ** 2) ** 0.5))
         x = abs((-math.tan(angle) * target_point[0] + target_point[1]) / ((1 + math.tan(angle) ** 2) ** 0.5))
-        print(x_xlxc, y_xlxc)
-        print(x, y)
+
         if y_xlxc >= 0 and x_xlxc >= 0:
             base_x = x
             base_y = y
@@ -280,7 +277,6 @@ def getCoordinate(survey_point, target_point, bias):
     # print(unit_longitude,unit_latitude)
     # print(long, lat)
 
-    print(str(long + survey_point[1]) + " " + str(lat + survey_point[0]))
     return [lat + survey_point[0], long + survey_point[1], target_point[2]*0.3048]
 
 def getDigit(name):

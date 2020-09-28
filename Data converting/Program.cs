@@ -89,11 +89,15 @@ namespace ProceeRvtFile
                     }
                     RevitFileUtils file = new RevitFileUtils(folderPath + "/" + fsi.ToString(), building_name);
 
-                    file.GetVersion();
+                    
+                    files.Add(file);
+                    /*
+                     * file.GetVersion();
                     if (file.getFileVersion() == "2015" || file.getFileVersion() == "2016" || file.getFileVersion() == "2017" || file.getFileVersion() == "2018" || file.getFileVersion() == "2019" || file.getFileVersion() == "2020")
                     {
                         files.Add(file);
                     }
+                    */
                 }
             }
             foreach (RevitFileUtils f in files)

@@ -170,15 +170,11 @@ namespace Window
                     continue;
                 }
 
-                Console.WriteLine(result);
-                Console.WriteLine(window.Location);
                 XYZ windowLocationXyz = (window.Location as LocationPoint).Point;
-                Console.WriteLine(windowLocationXyz);
                 windowLocations.Add(building_name);
                 windowLocations.Add(result.Name);
                 windowLocations.Add(windowLocationXyz.X);
                 windowLocations.Add(windowLocationXyz.Y);
-
                 windowLocations.Add(windowLocationXyz.Z - first_floor_height);
                 windowData.Add(windowLocations);
             }
@@ -243,6 +239,14 @@ namespace Window
                 double r_long_big = -200;
                 double r_lat_small = 200;
                 double r_long_small = 200;
+
+                List basePointLocation = new List();
+                for(int i = 0; i < 5; i++)
+                {
+                    basePointLocation.Add(0);
+                }
+                windowData.Add(basePointLocation);
+
                 foreach (List window in windowData)
                 {
                     List point = new List();
@@ -251,9 +255,11 @@ namespace Window
                     target_point.Add(window[3]);
                     target_point.Add(window[4]);
                     List r = obj.getCoordinate(survey_point, target_point, bias);
-                    String sql_data = "('" + window[0] + "', '" + window[1] + "', '" + r[0] + "', '" + r[1] + "', '" + r[2] + "');";
-                    sql_insert += "INSERT INTO `window` (`building_name`, `room_name`, `latitude`, `longitude`, `height`) VALUES " + sql_data;
-
+                    if(window[0].ToString() != "0" && window[1].ToString() != "0")
+                    {
+                        String sql_data = "('" + window[0] + "', '" + window[1] + "', '" + r[0] + "', '" + r[1] + "', '" + r[2] + "');";
+                        sql_insert += "INSERT INTO `window` (`building_name`, `room_name`, `latitude`, `longitude`, `height`) VALUES " + sql_data;
+                    }
                     if (r_lat_big < (double)r[0])
                     {
                         r_lat_big = (double)r[0];
@@ -275,6 +281,7 @@ namespace Window
                     point.Add(r[1]);
                     draw.Add(point);
                 }
+
                 double lat_difference = r_lat_big - r_lat_small;
                 double long_difference = r_long_big - r_long_small;
                 double a1;
@@ -285,15 +292,32 @@ namespace Window
                     a1 = 900 / lat_difference;
                     b1 = -(a1 * r_lat_small);
                     b2 = -(a1 * r_long_small);
+                    int index = 0;
                     foreach (List poi in draw)
                     {
-                        double y = 1000 - ((double)poi[0] * a1 + b1 + 50);
-                        double x = (double)poi[1] * a1 + b2 + 50;
-                        System.Drawing.Rectangle rec = new System.Drawing.Rectangle((int)x - 4, (int)y - 4, 8, 8);
-                        graphics.FillRectangle(b, rec);
+                        index = index + 1;
+                        if (index == draw.Count)
+                        {
+                            double y = 1000 - ((double)poi[0] * a1 + b1 + 50);
+                            double x = (double)poi[1] * a1 + b2 + 50;
+
+                            Brush br = new SolidBrush(System.Drawing.Color.Red);
+                            System.Drawing.Rectangle rec = new System.Drawing.Rectangle((int)x - 8, (int)y - 8, 16, 16);
+                            graphics.FillRectangle(br, rec);
+                            break;
+                        }
+                        if ((double)poi[0] != (double)survey_point[0] && (double)poi[1] != (double)survey_point[1])
+                        {
+                            double y = 1000 - ((double)poi[0] * a1 + b1 + 50);
+                            double x = (double)poi[1] * a1 + b2 + 50;
+                            System.Drawing.Rectangle rec = new System.Drawing.Rectangle((int)x - 4, (int)y - 4, 8, 8);
+                            graphics.FillRectangle(b, rec);
+                        }
                     }
-                    double y_base = 1000 - ((double)survey_point[0] * a1 + b2 + 50);
-                    double x_base = (double)survey_point[1] * a1 + b1 + 50;
+                    double y_base = 1000 - ((double)survey_point[0] * a1 + b1 + 50);
+                    double x_base = (double)survey_point[1] * a1 + b2 + 50;
+
+
                     Brush r = new SolidBrush(System.Drawing.Color.Red);
                     System.Drawing.Rectangle rec_base = new System.Drawing.Rectangle((int)x_base - 8, (int)y_base - 8, 16, 16);
                     graphics.FillRectangle(r, rec_base);
@@ -303,20 +327,35 @@ namespace Window
                     a1 = 900 / long_difference;
                     b1 = -(a1 * r_long_small);
                     b2 = -(a1 * r_lat_small);
+                    int index = 0;
                     foreach (List poi in draw)
                     {
-                        double y = 1000- ((double)poi[0] * a1 + b2 + 50);
+
+                        index = index + 1;
+                        if (index == draw.Count)
+                        {
+                            double yb = 1000 - ((double)poi[0] * a1 + b2 + 50);
+                            double xb = (double)poi[1] * a1 + b1 + 50;
+
+                            Brush br = new SolidBrush(System.Drawing.Color.Red);
+                            System.Drawing.Rectangle recb = new System.Drawing.Rectangle((int)xb - 8, (int)yb - 8, 16, 16);
+                            graphics.FillRectangle(br, recb);
+                            break;
+                        }
+                        double y = 1000 - ((double)poi[0] * a1 + b2 + 50);
                         double x = (double)poi[1] * a1 + b1 + 50;
                         System.Drawing.Rectangle rec = new System.Drawing.Rectangle((int)x - 4, (int)y - 4, 8, 8);
                         graphics.FillRectangle(b, rec);
                     }
                     double y_base = 1000 - ((double)survey_point[0] * a1 + b2 + 50);
                     double x_base = (double)survey_point[1]* a1 + b1 + 50;
+
                     Brush r = new SolidBrush(System.Drawing.Color.Red);
                     System.Drawing.Rectangle rec_base = new System.Drawing.Rectangle((int)x_base - 8, (int)y_base - 8, 16, 16);
                     graphics.FillRectangle(r, rec_base);
                 }
                 myimage.Save("..\\..\\..\\images/" + building_name + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+
 
                 MySqlCommand cmd = new MySqlCommand(sql_insert, conn);
                 int result = cmd.ExecuteNonQuery();
