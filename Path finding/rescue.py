@@ -11,7 +11,7 @@ PASSWORD = '0106259685'
 DATABASE = 'rescue'
 
 # building config
-FIRE_ROOM_NAME = "CLASSROOM 231 | LEVEL 02"
+FIRE_ROOM_NAME = "SCIENCE 250 | LEVEL 02"
 BUILDING_NAME = "1507_DREXEL PSLAMS_CENTRAL_190327"
 
 inf = float("inf")
@@ -138,7 +138,7 @@ def paint_map(map, map_number, destination):
     else:
         plt.text(float(endPoint[0])-6, float(endPoint[1]), destination)
 
-    plt.title("step: " + str(map_number) + " " + level + ", go to " + destination, size=20)
+    plt.title("Step: " + str(map_number) + ", current level: " + level + ", please go to " + destination, size=20)
     plt.savefig("picture/" + "step " +str(map_number) + ".png")
     plt.clf()
 
