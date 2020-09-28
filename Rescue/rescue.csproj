@@ -146,6 +146,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="config.cs" />
     <Compile Include="RevitFile.cs" />
     <Compile Include="ProcessRevitFiles.cs" />
     <Compile Include="Program.cs" />

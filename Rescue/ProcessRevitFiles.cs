@@ -16,19 +16,9 @@ using System.Threading;
 using Org.BouncyCastle.Math.EC.Multiplier;
 using System.Runtime.ExceptionServices;
 
+
 namespace Window
 {
-
-    public class Vertex
-    {
-        public Room room;
-        public bool IsVisited;
-        public Vertex(Room r)
-        {
-            room = r;
-        }
-    }
-
     public class revitFile
     {
         private List files;
@@ -60,7 +50,7 @@ namespace Window
         {
             var assemblyName = new AssemblyName(args.Name);
 
-            //在安装路径中查找相关dll并加载
+            //Find the relevant DLL in the installation path and load it
             foreach (var item in Searchs)
             {
                 var file = string.Format("{0}.dll", System.IO.Path.Combine(item, assemblyName.Name));
@@ -76,7 +66,7 @@ namespace Window
         public List<ModelCurve> ModelCurve_Of_FloorBoundary(Autodesk.Revit.DB.Document doc, Floor floor)
         {
             List<ModelCurve> mclist = new List<ModelCurve>();
-            //通过删除查找板边线
+            //Find board edges by deleting
             Transaction transTemp = new Transaction(doc); transTemp.Start("tempDelete");
             ICollection<ElementId> flooredge_idlist = doc.Delete(floor.Id);
             transTemp.RollBack();
@@ -86,7 +76,7 @@ namespace Window
                 Element e = doc.GetElement(id);
                 if (e is ModelLine)
                 {
-                    //大于等于16个参数的ModelLine是边界，12个是坡度箭头，6个是跨方向
+                    //Modellines with 16 or more parameters are boundaries, 12 are slope arrows, and 6 are span directions
                     if ((e as ModelLine).Parameters.Size > 12)
                         mclist.Add(e as ModelLine);
                 }
@@ -101,7 +91,7 @@ namespace Window
 
             var clientId = new ClientApplicationId(Guid.NewGuid(), "LK", "BIMAPI");
 
-            //"I am authorized by Autodesk to use this UI-less functionality."只能为该字符串
+            //"I am authorized by Autodesk to use this UI-less functionality." Can only be this string.
             _product.Init(clientId, "I am authorized by Autodesk to use this UI-less functionality.");
 
             foreach (RevitFileUtils file in files)
@@ -113,27 +103,19 @@ namespace Window
 
         public void convertRevitFile(string filepath, Product _product, string building_name)
         {
-
             Console.WriteLine(filepath);
             var Application = _product.Application;
             Console.WriteLine("Current Revit version: " + Application.VersionName);
 
             Document doc = Application.OpenDocumentFile(filepath);
-            
-            
             Console.WriteLine("RVT FILE OPENED");
-            Console.WriteLine(doc.Title);
-            /*
-             * OfClass(typeof(Wall))
-             * 1507_DREXEL PSLAMS_CENTRAL_190327.rvt
-             * three_layers.rvt
-             */
+            Console.WriteLine("Current filename: " + doc.Title);
+
             ScriptRuntime pyRumTime = Python.CreateRuntime();
             dynamic obj = pyRumTime.UseFile("..\\..\\..\\room_finder.py");
             Console.WriteLine(obj.welcome("Test function in my Python"));
 
-
-            Console.WriteLine("--------------------------------------------------------------------------------------------");
+            Console.WriteLine("----------------------------------------START GETTING VIEW-------------------------------------------");
             FilteredElementCollector collector = new FilteredElementCollector(doc);
             var it = collector.OfClass(typeof(View)).ToArray();
             List<View> views = new List<View>();
@@ -141,7 +123,6 @@ namespace Window
             int elementNumber = -1;
             foreach (Element v in it)
             {
-
                 View3D view3D = v as View3D;
                 if (view3D != null)
                 {
@@ -158,7 +139,9 @@ namespace Window
                 }
             }
             views.Add(largestView3D);
-
+            Console.WriteLine("----------------------------------------GETTING VIEW SUCCEED-------------------------------------------");
+            Console.WriteLine();
+            Console.WriteLine("----------------------------------------START GETTING FIRST LEVEL-----------------------------------------");
             FilteredElementCollector levelCollector = new FilteredElementCollector(doc);
             var levels = levelCollector.OfClass(typeof(Level)).ToArray();
             ElementId level_id = levels[0].Id;
@@ -172,19 +155,16 @@ namespace Window
                     groundFloorLevel = l;
                 }
             }
-
+            Console.WriteLine("----------------------------------------GETTING FIRST LEVEL SUCCEED---------------------------------------");
+            Console.WriteLine();
+            Console.WriteLine("----------------------------------------START GETTING DOOR CONNECTION-------------------------------------");
             FilteredElementCollector doorCollector = new FilteredElementCollector(doc);
-
             var doors = doorCollector.OfCategory(BuiltInCategory.OST_Doors).OfClass(typeof(FamilyInstance)).ToArray();
 
-
-            Console.WriteLine(doors);
             List<List> roomEdges = new List<List>();
-
             List exitRoom = new List();
             List exitDoor = new List();
 
-            Console.WriteLine("door name");
             foreach (FamilyInstance door in doors)
             {
                 Room room = door.Room;
@@ -237,14 +217,10 @@ namespace Window
                     }
                 }
             }
-
-            foreach (FamilyInstance door in doors)
-            {
-                
-            }
-
+            Console.WriteLine("----------------------------------------GETTING DOOR CONNECTION SUCCEED-------------------------------------------");
+            Console.WriteLine();
+            Console.WriteLine("----------------------------------------START GETTING STAIR CONNECTION(This takes a long time)---------------------------");
             FilteredElementCollector roomCollector = new FilteredElementCollector(doc);
-
             var rooms = roomCollector.OfCategory(BuiltInCategory.OST_Rooms).ToArray();
 
             FilteredElementCollector stairCollector = new FilteredElementCollector(doc);
@@ -268,32 +244,27 @@ namespace Window
 
                 for(int i = 0; i < 10000; i++)
                 {
-                    if (current_height + 5 > end_height)
+                    if (current_height + 6 > end_height)
                     {
                         current_height = end_height + 1;
                     }
 
                     Room currentRoom = null;
                     XYZ possiblePoint0 = new XYZ(b.Max.X, b.Max.Y, current_height);
-                    XYZ possiblePoint1 = new XYZ(b.Min.X, b.Min.Y, current_height);
-                    XYZ possiblePoint2 = new XYZ((b.Max.X + b.Min.X) / 2, (b.Max.Y + b.Min.Y) / 2, current_height);
+                    XYZ possiblePoint1 = new XYZ((b.Max.X + b.Min.X) / 2, (b.Max.Y + b.Min.Y) / 2, current_height);
 
                     Room possibleRoom0 = doc.GetRoomAtPoint(possiblePoint0);
                     Room possibleRoom1 = doc.GetRoomAtPoint(possiblePoint1);
-                    Room possibleRoom2 = doc.GetRoomAtPoint(possiblePoint2);
 
                     if (possibleRoom0 != null)
                     {
                         currentRoom = possibleRoom0;
                     }
-                    else if (possibleRoom1 != null)
+                    else
                     {
                         currentRoom = possibleRoom1;
                     }
-                    else
-                    {
-                        currentRoom = possibleRoom2;
-                    }
+
                     if(currentRoom == null)
                     {
                         continue;
@@ -314,12 +285,11 @@ namespace Window
                             }
                             if(roomCount == stairConnectRooms.Count)
                             {
-
                                 stairConnectRooms.Add(currentRoom);
                             }
                         }
                     }
-                    current_height = current_height + 5;
+                    current_height = current_height + 6;
                     if (current_height > end_height)
                     {
                         break;
@@ -330,7 +300,11 @@ namespace Window
                 Room possibleTop1 = doc.GetRoomAtPoint(new XYZ(b.Min.X, b.Min.Y, b.Max.Z + 1));
                 Room possibleTop2 = doc.GetRoomAtPoint(new XYZ((b.Max.X + b.Min.X) / 2, (b.Max.Y + b.Min.Y) / 2, b.Max.Z + 1));
 
-                foreach(Room p in possibleRoomList)
+                possibleRoomList.Add(possibleTop);
+                possibleRoomList.Add(possibleTop1);
+                possibleRoomList.Add(possibleTop2);
+
+                foreach (Room p in possibleRoomList)
                 {
                     if(p != null)
                     {
@@ -372,7 +346,8 @@ namespace Window
                     }
                 }  
             }
-            
+            Console.WriteLine("----------------------------------------GETTING STAIR CONNECTION SUCCEED-------------------------------------------");
+            Console.WriteLine();
 
             List room_boundary_no_walls = new List();
             List walls = new List();
@@ -421,16 +396,12 @@ namespace Window
                     }
                 }
             }
-            Console.WriteLine("000000000000000000000000000000000000000000000000000000000");
             foreach (List room_1 in room_boundary_no_walls)
             {
                 foreach (List room_2 in room_boundary_no_walls)
                 {
-                    double height_difference = Math.Abs((room_1[1] as XYZ).Z - (room_2[1] as XYZ).Z) ;
                     if((room_1[0] as Room).LevelId == (room_2[0] as Room).LevelId)
                     {
-                        //double slope1 = ((room_1[1] as XYZ).Y - (room_1[2] as XYZ).Y) / ((room_1[1] as XYZ).X - (room_1[2] as XYZ).X);
-                        //double slope2 = ((room_2[1] as XYZ).Y - (room_2[2] as XYZ).Y) / ((room_2[1] as XYZ).X - (room_2[2] as XYZ).X);
                         double slope1;
                         double slope2;
                         if (Math.Abs((room_1[1] as XYZ).X - (room_1[2] as XYZ).X) > 0.1)
@@ -439,7 +410,7 @@ namespace Window
                         }
                         else
                         {
-                            slope1 = 100000000;
+                            slope1 = 10000000;
                         }
                         if (Math.Abs((room_2[1] as XYZ).X - (room_2[2] as XYZ).X) > 0.1)
                         {
@@ -447,7 +418,7 @@ namespace Window
                         }
                         else
                         {
-                            slope2 = 100000000;
+                            slope2 = 10000000;
                         }
 
                         if (Math.Abs(slope1-slope2)<0.05 || Math.Abs(slope1 / slope2 - 1) < 0.05)
@@ -459,25 +430,49 @@ namespace Window
                             {
                                 if (distance < 2)
                                 {
-                                    List roomlist1 = new List();
-                                    roomlist1.Add((room_1[0] as Room));
-                                    roomlist1.Add((room_2[0] as Room));
-                                    roomlist1.Add("no wall");
-                                    roomEdges.Add(roomlist1);
+                                    double length1 = Math.Max((room_1[1] as XYZ).X, (room_1[2] as XYZ).X) - Math.Min((room_2[1] as XYZ).X, (room_2[2] as XYZ).X);
+                                    double length2 = Math.Max((room_2[1] as XYZ).X, (room_2[2] as XYZ).X) - Math.Min((room_1[1] as XYZ).X, (room_1[2] as XYZ).X);
+
+                                    double length3 = Math.Max((room_1[1] as XYZ).Y, (room_1[2] as XYZ).Y) - Math.Min((room_2[1] as XYZ).Y, (room_2[2] as XYZ).Y);
+                                    double length4 = Math.Max((room_2[1] as XYZ).Y, (room_2[2] as XYZ).Y) - Math.Min((room_1[1] as XYZ).Y, (room_1[2] as XYZ).Y);
+
+                                    if (length1 > 0 && length2 > 0)
+                                    {
+                                        double ratio = Math.Min(length1, length2) / Math.Max(length1, length2);
+                                        if (ratio > 0.1)
+                                        {
+                                            List roomlist1 = new List();
+                                            roomlist1.Add((room_1[0] as Room));
+                                            roomlist1.Add((room_2[0] as Room));
+
+                                            roomlist1.Add("no wall");
+                                            roomEdges.Add(roomlist1);
+                                            break;
+                                        }
+                                    }
+                                    if (length3 > 0 && length4 > 0)
+                                    {
+                                        double ratio1 = Math.Min(length3, length4) / Math.Max(length3, length4);
+                                        if (ratio1 > 0.1)
+                                        {
+                                            List roomlist1 = new List();
+                                            roomlist1.Add((room_1[0] as Room));
+                                            roomlist1.Add((room_2[0] as Room));
+
+                                            roomlist1.Add("no wall");
+                                            roomEdges.Add(roomlist1);
+                                            break;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-            Console.WriteLine(roomEdges.Count);
-
-            FilteredElementCollector exitCollector = new FilteredElementCollector(doc);
-            var exits = exitCollector.OfCategory(BuiltInCategory.OST_Doors).OfClass(typeof(FamilyInstance)).ToArray();
-
-
-            FilteredElementCollector floorCollector = new FilteredElementCollector(doc);
-            var floors = floorCollector.OfCategory(BuiltInCategory.OST_Floors).ToArray();
+            Console.WriteLine("----------------------------------------GETTING BOUNDARY CONNECTION SUCCEED-------------------------------------------");
+            Console.WriteLine();
+            Console.WriteLine("----------------------------------------START GETTING BOUNDARY-------------------------------------------");
 
             List boundaryList = new List();
             foreach (Room room in rooms)
@@ -492,9 +487,6 @@ namespace Window
                         {
                             foreach (BoundarySegment boundarySegment in segmentList)
                             {
-                                /*
-                                Wall wall = doc.GetElement(boundarySegment.ElementId) as Wall;
-                                */
                                 List boundary = new List();
                                 XYZ start = boundarySegment.GetCurve().GetEndPoint(0);
                                 XYZ end = boundarySegment.GetCurve().GetEndPoint(1);
@@ -507,11 +499,9 @@ namespace Window
                     }
                 }
             }
-            Console.WriteLine("Boundary: ");
-            Console.WriteLine(boundaryList.Count);
+            
 
             List boundaryOutLine = new List();
-
             int indexRoom1 = 0;
             foreach (List room_1 in boundaryList)
             {
@@ -578,26 +568,21 @@ namespace Window
                     if (indexBoundary == boundaryList.Count)
                     {
                         double length1 = Math.Pow(Math.Pow((room_1[1] as XYZ).X - (room_1[2] as XYZ).X, 2) + Math.Pow((room_1[1] as XYZ).Y - (room_1[2] as XYZ).Y, 2), 0.5);
-
-                        if (length1 > 3.5)
+                        if (length1 > 3.281)
                         {
                             List boundaryList1 = new List();
                             boundaryList1.Add(room_1[0] as Room);
                             boundaryList1.Add(room_1[1]);
                             boundaryList1.Add(room_1[2]);
-                            
-                            Console.WriteLine((room_1[1] as XYZ).X + " " + (room_1[1] as XYZ).Y);
-                            Console.WriteLine((room_1[2] as XYZ).X + " " + (room_1[2] as XYZ).Y);
-                            Console.WriteLine(" ");
-                            
                             boundaryOutLine.Add(boundaryList1);
                         }
                     }
                     
                 }
             }
-            Console.WriteLine(boundaryOutLine.Count);
-
+            Console.WriteLine("----------------------------------------GETTING BOUNDARY SUCCEED-------------------------------------------");
+            Console.WriteLine();
+            Console.WriteLine("----------------------------------------START GETTING EXIT ROOM-------------------------------------------");
             foreach (FamilyInstance door in exitDoor)
             {
                 double edge_x = (door.get_BoundingBox(views[0]).Max.X + door.get_BoundingBox(views[0]).Min.X) / 2;
@@ -638,7 +623,6 @@ namespace Window
                         {
                             if ((boundryRoom[0] as Room).Name == roomOfDoor.Name)
                             {
-                                Console.WriteLine(edge_x.ToString() + " " + edge_y.ToString());
                                 List exit = new List();
                                 exit.Add(boundryRoom[0] as Room);
                                 exit.Add(doorPoint);
@@ -659,15 +643,20 @@ namespace Window
                             {
                                 if ((boundryRoom[0] as Room).Name == roomOfDoor2.Name && (boundryRoom[0] as Room).Name == possibleExit.Name && roomOfDoor1 == null)
                                 {
-                                    Console.WriteLine(edge_x.ToString() + " " + edge_y.ToString());
+                                    List exit = new List();
+                                    exit.Add(boundryRoom[0] as Room);
+                                    exit.Add(doorPoint);
+                                    exitRoom.Add(exit);
                                 }
                             }
                         }
                     }
                 }
             }
-                
-            String connetStr = "server=127.0.0.1;port=3306;user=root;password=0106259685; database=rescue;";
+            Console.WriteLine("----------------------------------------GETTING EXIT ROOM SUCCEED-------------------------------------------");
+            Console.WriteLine();
+
+            String connetStr = "server=" + config.host + ";port= "+ config.port +";user=" + config.USER + ";password=" + config.PASSWORD + "; database=" + config.DATABASE +";";
             MySqlConnection conn = new MySqlConnection(connetStr);
             try
             {
@@ -677,18 +666,18 @@ namespace Window
             {
                 if (ex.Message == "Unable to connect to any of the specified MySQL hosts.")
                 {
-                    Console.WriteLine("创建连接");
+                    Console.WriteLine("Unable to connect to any of the specified MySQL hosts.");
                 }
-                else if (ex.Message == "Authentication to host '127.0.0.1' for user 'root' using method 'caching_sha2_password' failed with message: Unknown database 'rescue'")
+                else if (ex.Message == "Authentication to host '" + config.host +"' for user '" + config.USER + "' using method 'caching_sha2_password' failed with message: Unknown database '" + config.DATABASE+ "'")
                 {
-                    String connetStr1 = "server=127.0.0.1;port=3306;user=root;password=0106259685";
+                    String connetStr1 = "server=" + config.host + ";port=" + config.port + ";user=" + config.USER + ";password=" + config.PASSWORD + "";
                     MySqlConnection conn1 = new MySqlConnection(connetStr1);
                     conn1.Open();
-                    string sql_createDatabase = "CREATE SCHEMA `rescue` ";
+                    string sql_createDatabase = "CREATE SCHEMA `" + config.DATABASE + "` ";
                     MySqlCommand cmd = new MySqlCommand(sql_createDatabase, conn1);
                     int result = cmd.ExecuteNonQuery();
 
-                    string sql_create_table_edge = "CREATE TABLE `rescue`.`edge` (" +
+                    string sql_create_table_edge = "CREATE TABLE `" + config.DATABASE + "`.`edge` (" +
                                                    "`id_edge` INT NOT NULL AUTO_INCREMENT," +
                                                    "`building_name` VARCHAR(100) NOT NULL," +
                                                    "`node1` VARCHAR(100) NOT NULL," +
@@ -698,7 +687,7 @@ namespace Window
                                                    "`edge_location` VARCHAR(100) NOT NULL," +
                                                    "PRIMARY KEY(`id_edge`))";
 
-                    string sql_create_table_node = "CREATE TABLE `rescue`.`node` (" +
+                    string sql_create_table_node = "CREATE TABLE `" + config.DATABASE + "`.`node` (" +
                                                    "`id_node` INT NOT NULL AUTO_INCREMENT," +
                                                    "`building_name` VARCHAR(100) NOT NULL," +
                                                    "`room_name` VARCHAR(100) NOT NULL," +
@@ -707,7 +696,7 @@ namespace Window
                                                    "`exit_location` VARCHAR(100) NOT NULL," +
                                                    "PRIMARY KEY(`id_node`));";
 
-                    string sql_create_table_wall = "CREATE TABLE `rescue`.`wall` (" +
+                    string sql_create_table_wall = "CREATE TABLE `" + config.DATABASE + "`.`wall` (" +
                                                     "`id_wall` INT NOT NULL AUTO_INCREMENT," +
                                                     "`building_name` VARCHAR(100) NOT NULL," +
                                                     "`room_name` VARCHAR(100) NOT NULL," +
@@ -715,28 +704,25 @@ namespace Window
                                                     "`end_point` VARCHAR(100) NOT NULL," +
                                                     "PRIMARY KEY(`id_wall`));";
 
-                    string sql_create_table_fire =  "CREATE TABLE `rescue`.`fire` (" +
+                    string sql_create_table_fire = "CREATE TABLE `" + config.DATABASE + "`.`fire` (" +
                                                     "`id_fire` INT NOT NULL," +
                                                     "`building_name` VARCHAR(100) NOT NULL," +
                                                     "`room_name` VARCHAR(100) NOT NULL," +
                                                     "PRIMARY KEY(`id_fire`));";
 
                     MySqlCommand cmd1 = new MySqlCommand(sql_create_table_edge, conn1);
-                    int result1 = cmd1.ExecuteNonQuery();
+                    cmd1.ExecuteNonQuery();
 
                     MySqlCommand cmd2 = new MySqlCommand(sql_create_table_node, conn1);
-                    int result2 = cmd2.ExecuteNonQuery();
+                    cmd2.ExecuteNonQuery();
 
                     MySqlCommand cmd3 = new MySqlCommand(sql_create_table_wall, conn1);
-                    int result3 = cmd3.ExecuteNonQuery();
+                    cmd3.ExecuteNonQuery();
 
                     MySqlCommand cmd4 = new MySqlCommand(sql_create_table_fire, conn1);
-                    int result4 = cmd4.ExecuteNonQuery();
+                    cmd4.ExecuteNonQuery();
 
-                    Console.WriteLine(result1);
-                    Console.WriteLine(result2);
-                    Console.WriteLine(result3);
-                    Console.WriteLine("创建数据库");
+                    Console.WriteLine("Create database succeed!");
                 }
             }
             finally
@@ -746,9 +732,8 @@ namespace Window
 
             try
             {
-                conn.Open();//打开通道，建立连接，可能出现异常,使用try catch语句
-                Console.WriteLine("已经建立连接");
-                //在这里使用代码对数据库进行增删查改
+                conn.Open();
+                Console.WriteLine("Connection established");
                 string sql_insert = "";
                 string sql_insert1 = "";
                 string sql_insert2 = "";
@@ -766,7 +751,6 @@ namespace Window
                     if (edge[2].GetType().Name == "FamilyInstance")
                     {
                         edge_type = "door";
-                        
                         if((edge[2] as FamilyInstance).get_BoundingBox(views[0]) != null)
                         {
                             double edge_x = ((edge[2] as FamilyInstance).get_BoundingBox(views[0]).Max.X + (edge[2] as FamilyInstance).get_BoundingBox(views[0]).Min.X) / 2;
@@ -786,7 +770,7 @@ namespace Window
                     }
                     else if (edge[2].GetType().Name == "String")
                     {
-                        edge_type = "null";
+                        edge_type = "boundary";
                         edge_location = "null";
                     }
                     else
@@ -794,7 +778,7 @@ namespace Window
                         edge_type = "null";
                         edge_location = "null";
                     }
-                    sql_insert += "INSERT INTO `rescue`.`edge` (`building_name`, `node1`, `node2`, `length`, `edge_type`, `edge_location`) VALUES ('" + doc.Title + "', '" + (edge[0] as Room).Name +" | "+ (edge[0] as Room).Level.Name+ "', '" + (edge[1] as Room).Name +" | " + (edge[1] as Room).Level.Name + "', '" + dis + "', '" + edge_type + "', '" + edge_location + "');";
+                    sql_insert += "INSERT INTO `" + config.DATABASE + "`.`edge` (`building_name`, `node1`, `node2`, `length`, `edge_type`, `edge_location`) VALUES ('" + doc.Title + "', '" + (edge[0] as Room).Name +" | "+ (edge[0] as Room).Level.Name+ "', '" + (edge[1] as Room).Name +" | " + (edge[1] as Room).Level.Name + "', '" + dis + "', '" + edge_type + "', '" + edge_location + "');";
                 }
 
                 foreach(Room room in rooms)
@@ -809,20 +793,20 @@ namespace Window
                             {
                                 if ((r[0] as Room).Name == room.Name && room.LevelId == level_id)
                                 {
-                                    sql_insert1 += "INSERT INTO `rescue`.`node` (`building_name`, `room_name`, `room_location`, `is_exit`, `exit_location`) VALUES ('" + doc.Title + "', '" + room.Name + " | " + room.Level.Name + "', '" + (room.Location as LocationPoint).Point + "', 'true', '" + r[1].ToString() + "'); ";
+                                    sql_insert1 += "INSERT INTO `" + config.DATABASE + "`.`node` (`building_name`, `room_name`, `room_location`, `is_exit`, `exit_location`) VALUES ('" + doc.Title + "', '" + room.Name + " | " + room.Level.Name + "', '" + (room.Location as LocationPoint).Point + "', 'true', '" + r[1].ToString() + "'); ";
                                     break;
                                 }
                             }
                             if(i == exitRoom.Count)
                             {
-                                sql_insert1 += "INSERT INTO `rescue`.`node` (`building_name`, `room_name`, `room_location`, `is_exit`, `exit_location`) VALUES ('" + doc.Title + "', '" + room.Name + " | " + room.Level.Name + "', '" + (room.Location as LocationPoint).Point + "', 'false', 'null');";
+                                sql_insert1 += "INSERT INTO `" + config.DATABASE + "`.`node` (`building_name`, `room_name`, `room_location`, `is_exit`, `exit_location`) VALUES ('" + doc.Title + "', '" + room.Name + " | " + room.Level.Name + "', '" + (room.Location as LocationPoint).Point + "', 'false', 'null');";
                             }
                         }
                     }
                 }
                 foreach(List e in walls)
                 {
-                    sql_insert2 += "INSERT INTO `rescue`.`wall` (`building_name`, `room_name`, `start_point`, `end_point`) VALUES ('" + doc.Title + "' , '" + (e[0] as Room).Name + " | " + (e[0] as Room).Level.Name + "', '" + e[1] + "', '" + e[2] + "');";
+                    sql_insert2 += "INSERT INTO `" + config.DATABASE + "`.`wall` (`building_name`, `room_name`, `start_point`, `end_point`) VALUES ('" + doc.Title + "' , '" + (e[0] as Room).Name + " | " + (e[0] as Room).Level.Name + "', '" + e[1] + "', '" + e[2] + "');";
                 }
 
                 MySqlCommand cmd = new MySqlCommand(sql_insert, conn);
@@ -850,8 +834,8 @@ namespace Window
                 wlog.WriteLine("{0}", building_name);
                 wlog.Flush();
                 wlog.Close();
-                
                 conn.Close();
+                Console.WriteLine("File " + doc.Title + " finished!");
             }
             doc.Close();
             /*
