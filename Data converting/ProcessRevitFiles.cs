@@ -15,10 +15,6 @@ using System.Drawing;
 
 namespace Window
 {
-    public class drawPicture
-    {
-
-    }
     public class revitFile
     {
         private List files;
@@ -50,7 +46,7 @@ namespace Window
         {
             var assemblyName = new AssemblyName(args.Name);
 
-            //在安装路径中查找相关dll并加载
+            //Find the relevant DLL in the installation path and load it.
             foreach (var item in Searchs)
             {
                 var file = string.Format("{0}.dll", System.IO.Path.Combine(item, assemblyName.Name));
@@ -69,7 +65,7 @@ namespace Window
 
             var clientId = new ClientApplicationId(Guid.NewGuid(), "LK", "BIMAPI");
 
-            //"I am authorized by Autodesk to use this UI-less functionality."只能为该字符串
+            //"I am authorized by Autodesk to use this UI-less functionality."
             _product.Init(clientId, "I am authorized by Autodesk to use this UI-less functionality.");
 
             foreach (RevitFileUtils file in files)
@@ -88,11 +84,7 @@ namespace Window
 
             Document doc = Application.OpenDocumentFile(filepath);
             Console.WriteLine("RVT FILE OPENED");
-            /*
-             * OfClass(typeof(Wall))
-             * 1507_DREXEL PSLAMS_CENTRAL_190327.rvt
-             * three_layers.rvt
-             */
+
             ScriptRuntime pyRumTime = Python.CreateRuntime();
             dynamic obj = pyRumTime.UseFile("..\\..\\..\\room_finder.py");
             Console.WriteLine(obj.welcome("Test function in my Python"));
@@ -136,29 +128,22 @@ namespace Window
                 bias.Add(pa);
             }
 
-            Console.WriteLine("--------------------------------------------------------------------------------------------");
             FilteredElementCollector windowCollector = new FilteredElementCollector(doc);
 
             var windows = windowCollector.OfCategory(BuiltInCategory.OST_Windows).OfClass(typeof(FamilyInstance)).ToArray();
-            Console.WriteLine(windows);
 
             FilteredElementCollector levelCollector = new FilteredElementCollector(doc);
             var levels = levelCollector.OfClass(typeof(Level)).ToArray();
             double elevation = (double)bias[2];
             foreach (Level l in levels)
             {
-                Console.WriteLine(l.Elevation);
-                Console.WriteLine(l.Name);
                 int floor_number = obj.getDigit(l.Name);
-                Console.WriteLine(floor_number);
                 if (floor_number == 1)
                 {
                     elevation = l.Elevation;
                 }
             }
-            Console.WriteLine(elevation);
             double first_floor_height = elevation - (double)bias[2];
-            Console.WriteLine(first_floor_height);
 
             List<List> windowData = new List<List>();
             foreach (FamilyInstance window in windows)
@@ -197,10 +182,8 @@ namespace Window
                 windowLocations.Add(windowLocationXyz.Z - first_floor_height);
                 windowData.Add(windowLocations);
             }
-            /*
-            obj.storeWindowData(windowData);
-            */
-            String connetStr = "server=127.0.0.1;port=3306;user=root;password=0106259685; database=window;";
+
+            String connetStr = "server=" + config.host + ";port= " + config.port + ";user=" + config.USER + ";password=" + config.PASSWORD + "; database=" + config.DATABASE + ";";
             MySqlConnection conn = new MySqlConnection(connetStr);
             try
             {
@@ -210,18 +193,18 @@ namespace Window
             {
                 if (ex.Message == "Unable to connect to any of the specified MySQL hosts.")
                 {
-                    Console.WriteLine("创建连接");
+                    Console.WriteLine("Creat connection");
                 }
                 else if (ex.Message == "Authentication to host '127.0.0.1' for user 'root' using method 'caching_sha2_password' failed with message: Unknown database 'window'")
                 {
-                    String connetStr1 = "server=127.0.0.1;port=3306;user=root;password=0106259685";
+                    String connetStr1 = "server=" + config.host + ";port=" + config.port + ";user=" + config.USER + ";password=" + config.PASSWORD + ";";
                     MySqlConnection conn1 = new MySqlConnection(connetStr1);
                     conn1.Open();
-                    string sql_createDatabase = "CREATE SCHEMA `window` ";
+                    string sql_createDatabase = "CREATE SCHEMA `" + config.DATABASE + "` ";
                     MySqlCommand cmd = new MySqlCommand(sql_createDatabase, conn1);
                     int result = cmd.ExecuteNonQuery();
 
-                    string sql_caeateTable = "CREATE TABLE `window`.`window` (" +
+                    string sql_caeateTable = "CREATE TABLE `" + config.DATABASE + "`.`window` (" +
                                              "`idwindow` INT(11) NOT NULL AUTO_INCREMENT," +
                                              "`building_name` VARCHAR(200) NOT NULL," +
                                              "`room_name` VARCHAR(100) NOT NULL," +
@@ -233,7 +216,7 @@ namespace Window
                     int result1 = cmd1.ExecuteNonQuery();
 
                     Console.WriteLine(result1);
-                    Console.WriteLine("创建数据库");
+                    Console.WriteLine("Create database");
                 }
             }
             finally
@@ -243,9 +226,8 @@ namespace Window
 
             try
             {
-                conn.Open();//打开通道，建立连接，可能出现异常,使用try catch语句
-                Console.WriteLine("已经建立连接");
-                //在这里使用代码对数据库进行增删查改
+                conn.Open();
+                Console.WriteLine("Connection established");
                 string sql = "INSERT INTO `window` (`building_name`, `room_name`, `lat`, `long`, `height`) VALUES ('three layers', 'MECHANIC ROOM', '50.5656', '20.0001', '20.55')";
                 string sql_insert = "";
 
@@ -301,18 +283,13 @@ namespace Window
                 if (lat_difference > long_difference)
                 {
                     a1 = 900 / lat_difference;
-                    Console.WriteLine("a1:" + a1);
                     b1 = -(a1 * r_lat_small);
-                    Console.WriteLine("b1:" + b1);
                     b2 = -(a1 * r_long_small);
-                    Console.WriteLine("b1:" + b2);
                     foreach (List poi in draw)
                     {
                         double y = 1000 - ((double)poi[0] * a1 + b1 + 50);
                         double x = (double)poi[1] * a1 + b2 + 50;
                         System.Drawing.Rectangle rec = new System.Drawing.Rectangle((int)x - 4, (int)y - 4, 8, 8);
-                        Console.WriteLine((int)x);
-                        Console.WriteLine((int)y);
                         graphics.FillRectangle(b, rec);
                     }
                     double y_base = 1000 - ((double)survey_point[0] * a1 + b2 + 50);
@@ -324,30 +301,21 @@ namespace Window
                 else
                 {
                     a1 = 900 / long_difference;
-                    Console.WriteLine("a1:" + a1);
                     b1 = -(a1 * r_long_small);
-                    Console.WriteLine("b1:" + b1);
                     b2 = -(a1 * r_lat_small);
-                    Console.WriteLine("b1:" + b2);
                     foreach (List poi in draw)
                     {
                         double y = 1000- ((double)poi[0] * a1 + b2 + 50);
                         double x = (double)poi[1] * a1 + b1 + 50;
                         System.Drawing.Rectangle rec = new System.Drawing.Rectangle((int)x - 4, (int)y - 4, 8, 8);
-                        Console.WriteLine((int)x);
-                        Console.WriteLine((int)y);
                         graphics.FillRectangle(b, rec);
                     }
                     double y_base = 1000 - ((double)survey_point[0] * a1 + b2 + 50);
                     double x_base = (double)survey_point[1]* a1 + b1 + 50;
-                    Console.WriteLine("x_base:" + x_base);
-                    Console.WriteLine("y_base:" + y_base);
                     Brush r = new SolidBrush(System.Drawing.Color.Red);
                     System.Drawing.Rectangle rec_base = new System.Drawing.Rectangle((int)x_base - 8, (int)y_base - 8, 16, 16);
                     graphics.FillRectangle(r, rec_base);
                 }
-                
-                Console.WriteLine("=======================================================");
                 myimage.Save("..\\..\\..\\images/" + building_name + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
 
                 MySqlCommand cmd = new MySqlCommand(sql_insert, conn);
@@ -367,6 +335,7 @@ namespace Window
                 wlog.Flush();
                 wlog.Close();
                 conn.Close();
+                Console.WriteLine("File " + doc.Title + " finished!");
             }
             doc.Close();
             /*
