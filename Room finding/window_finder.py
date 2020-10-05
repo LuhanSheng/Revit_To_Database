@@ -1,21 +1,20 @@
-# survey_point = [39.9578285217285, -75.1940307617188]
-# target_point = [-100, -100, 5]
-# bias = [0, 0, 0, 0.13]
-#
-# print(getCoordinate(survey_point, target_point, bias))
-#
-# # print(math.pi)
-# # print(sys.path)
+
 import pymysql
 import sys
-print(str(sys.argv))
+
+# database config
+HOST = '127.0.0.1'
+PORT = 3306
+USER = 'root'
+PASSWORD = '0106259685'
+DATABASE = 'rescue'
 
 # tolerance unit: meter
 tolerance = 10
 degree_tolerance = tolerance / 40000000 * 360
 
 # lat, long, height in meter
-fire_point = [39.916, 116.433, 0]
+fire_point = [float(sys.argv[1]), float(sys.argv[2]), float(sys.argv[3])]
 
 lat_upper_bound = fire_point[0] + degree_tolerance
 lat_lower_bound = fire_point[0] - degree_tolerance
@@ -23,19 +22,16 @@ lat_lower_bound = fire_point[0] - degree_tolerance
 long_upper_bound = fire_point[1] + degree_tolerance
 long_lower_bound = fire_point[1] - degree_tolerance
 
-print(degree_tolerance)
-print(lat_lower_bound, lat_upper_bound)
 sql = "SELECT * FROM window.window WHERE (longitude BETWEEN " + str(long_lower_bound) + " AND " + str(
     long_upper_bound) + ") AND (latitude BETWEEN " + str(lat_lower_bound) + " AND " + str(lat_upper_bound) + ");"
 # " AND (long BETWEEN " + str(lat_lower_bound)+ " AND " + str(lat_upper_bound)+
 # long BETWEEN " + str(lat_lower_bound)+ " AND " + str(lat_upper_bound)+
-print(sql)
 
-conn = pymysql.connect(host='127.0.0.1',
-                       port=3306,
-                       user='root',
-                       password='0106259685',
-                       db='window',
+conn = pymysql.connect(host=HOST,
+                       port=PORT,
+                       user=USER,
+                       password=PASSWORD,
+                       db=DATABASE,
                        charset='utf8',
                        )
 cur = conn.cursor()
@@ -47,11 +43,13 @@ distances = []
 if len(results) == 0:
     print("Did not find")
 else:
-    print(len(results), "possible rooms")
     for result in results:
         distance = (abs(fire_point[0] - result[3]) * 40000000 / 360) ** 2 + (
-                    abs(fire_point[1] - result[4]) * 40000000 / 360) ** 2 + (abs(fire_point[2] - result[5])) ** 2
+                abs(fire_point[1] - result[4]) * 40000000 / 360) ** 2 + (abs(fire_point[2] - result[5])) ** 2
         distances.append(distance)
-        print(distance, result[2])
     index = distances.index(min(distances))
-    print(results[index])
+    print("Building name: " + results[index][1])
+    print("Room name: " + results[index][2])
+    print("Window position: (" + str(results[index][3]) + ", " + str(results[index][4]) + ", " + str(results[index][5]) + ")")
+
+
