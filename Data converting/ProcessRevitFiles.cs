@@ -172,7 +172,7 @@ namespace Window
 
                 XYZ windowLocationXyz = (window.Location as LocationPoint).Point;
                 windowLocations.Add(building_name);
-                windowLocations.Add(result.Name);
+                windowLocations.Add(result.Name + " | " + result.Level.Name);
                 windowLocations.Add(windowLocationXyz.X);
                 windowLocations.Add(windowLocationXyz.Y);
                 windowLocations.Add(windowLocationXyz.Z - first_floor_height);
