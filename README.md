@@ -16,7 +16,7 @@ Please refer to [NYU technical report](https://cs.nyu.edu/dynamic/reports/) for 
 The most up-to-date version provided here is for Revit 2019/2020.
 
 
-## Installation
+## Install
 
 The IDE we used is Visual Studio(VS), So the installation shown here are based on VS.  
 If you use another IDE, you can just regard the part related to VS as a reference.  
