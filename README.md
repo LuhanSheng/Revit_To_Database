@@ -18,23 +18,9 @@ The most up-to-date version provided here is for Revit 2020.
 
 ## Installation
 
-You install RevitLookup just like any other Revit add-in,
-by [copying the add-in manifest and the assembly DLL to the Revit Add-Ins folder](http://help.autodesk.com/view/RVT/2019/ENU/?guid=Revit_API_Revit_API_Developers_Guide_Introduction_Add_In_Integration_Add_in_Registration_html).
-
-
-If you specify the full DLL pathname in the add-in manifest, it can also be located elsewhere.
-
-For more information on installing Revit add-ins in general, please refer to
-the [Revit API getting started material](http://thebuildingcoder.typepad.com/blog/about-the-author.html#2).
-
-Harry Mattison of [Boost your BIM](https://boostyourbim.wordpress.com) very kindly provides
-a ready-built [RevitLookup 2018 installer](https://boostyourbim.wordpress.com/2017/04/28/revit-lookup-2018-install):
-
-> If you don’t want to deal with source code and just want to use the tool, here
-is [Revit Lookup 2018.msi](https://drive.google.com/open?id=182W00Mk5Hj1FMHAo-xVnoFYlJ_s2Swrw),
-an installer for the compiled and signed DLL ready, courtesy of Boost Your BIM.
-
-
+The IDE we used is Visual Studio(VS), So the installation shown here are based on VS. 
+If you use another IDE, you can just regard the part related to VS as a reference.
+FireRevit requires  python version >=3.5, packages of pymysql, ironPython (v2.7.10) and MySql.Data (v8.0.21).
 
 
 ## Author
