@@ -18,9 +18,9 @@ The most up-to-date version provided here is for Revit 2020.
 
 ## Installation
 
-The IDE we used is Visual Studio(VS), So the installation shown here are based on VS. 
-If you use another IDE, you can just regard the part related to VS as a reference.
-FireRevit requires  python version >=3.5, packages of pymysql, ironPython (v2.7.10) and MySql.Data (v8.0.21).
+The IDE we used is Visual Studio(VS), So the installation shown here are based on VS.  
+If you use another IDE, you can just regard the part related to VS as a reference.  
+FireRevit requires  python version >=3.5, packages of pymysql, ironPython (v2.7.10) and MySql.Data (v8.0.21).  
 
 
 ## Author
