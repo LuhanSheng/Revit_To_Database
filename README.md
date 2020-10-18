@@ -6,25 +6,14 @@
 
 Revit secondary development project.  
 Using Revit Files to Identify the Location of Fire Danger and Escape Routes.  
-Under the guidance of Professor Dennis Shasha.  
+Under the guidance of Prof.Dennis Shasha.  
 
-Please refer to [NYU technical report](https://cs.nyu.edu/dynamic/reports/) for more information.
+Please refer to [NYU technical report](https://cs.nyu.edu/dynamic/reports/) for more information. Look down the page a little.
 
 
 ## <a name="versions"></a> Versions
 
 The most up-to-date version provided here is for Revit 2020.
-
-## <a name="builds"></a> Builds
-
-[Build Informed GmbH](https://www.buildinformed.com) very kindly set up a
-public [CI](https://en.wikipedia.org/wiki/Continuous_integration) for RevitLookup
-at [lookupbuilds.com](https://lookupbuilds.com)
-using [gitlab.com](https://gitlab.com).
-The output is dual-signed with the Build Informed certificate, zipped and published to an Amazon S3 bucket.
-For more information, please refer to
-the [Revit API discussion forum](http://forums.autodesk.com/t5/revit-api-forum/bd-p/160) thread
-on [CI for RevitLookup](https://forums.autodesk.com/t5/revit-api-forum/ci-for-revit-lookup/m-p/6947111).
 
 
 ## Installation
