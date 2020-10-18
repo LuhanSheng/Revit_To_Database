@@ -27,7 +27,7 @@ Besides, please add the references of:
 • RevitAPI.dll  
 • RevitAPIUI.dll  
 • RevitNET.dll  
-• RevitAddInUtility.dll  
+• RevitAddInUtility.dll (the property of Copy Local should be set to True)  
 Find these assemblies in the installation directory of Revit.  
 
 ## Author
