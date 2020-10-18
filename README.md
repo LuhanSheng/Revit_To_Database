@@ -35,3 +35,7 @@ Find these assemblies in the installation directory of Revit.
 Implemented by Luhan Sheng and Dennis Shasha.
 
 Maintained by Luhan Sheng.
+
+## Contact
+
+wc36170565@gmail.com
