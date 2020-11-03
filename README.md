@@ -8,7 +8,7 @@ Revit secondary development project.
 Using Revit Files to Identify the Location of Fire Danger and Escape Routes.  
 Under the guidance of Prof.Dennis Shasha.  
 
-Please refer to [NYU technical report](https://cs.nyu.edu/dynamic/reports/) for more information. Look down the page a little.
+Please refer to [NYU technical report](https://cs.nyu.edu/media/publications/RevitToDatabase.pdf) for more information.
 
 
 ## <a name="versions"></a> Versions
