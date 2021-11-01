@@ -1,22 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
+﻿using System.IO;
 using System.Text;
-using System.Threading.Tasks;
-using Autodesk.Revit;
-using Autodesk.Revit.DB;
-using Autodesk.RevitAddIns;
-using Autodesk.Revit.DB.Architecture;
-using IronPython.Hosting;
-using Microsoft.Scripting.Hosting;
-using IronPython.Runtime;
 using System.Text.RegularExpressions;
-using MySql.Data.MySqlClient;
-using System.Drawing;
 
-namespace Window
+namespace RevitToDatabase
 {
     public class RevitFileUtils
     {
@@ -77,6 +63,5 @@ namespace Window
             }
             fileVersion = version;
         }
-
     }
 }
