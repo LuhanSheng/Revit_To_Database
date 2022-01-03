@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+  <AddIn Type="Command">
+    <Assembly>RevitToDatabase.RevitToDatabase\RevitToDatabase.dll</Assembly>
+    <AddInId>d6d5a839-c60a-4122-be82-61b8052f304a</AddInId>
+    <FullClassName>RevitToDatabase.ConvertCommand</FullClassName>
+    <Text>Convert</Text>
+    <VendorId>ADSK</VendorId>
+    <VendorDescription>Autodesk, www.autodesk.com</VendorDescription>
+    <AvailabilityClassName>RevitToDatabase.ButtonAvailability</AvailabilityClassName>
+    <LongDescription>
+      This is the long description for my command.
+      This is another descriptive paragraph, with notes about how to use the command properly.
+    </LongDescription>
+  </AddIn>
+</RevitAddIns>
