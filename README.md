@@ -13,7 +13,7 @@ Please refer to [NYU technical report](https://cs.nyu.edu/media/publications/Rev
 
 ## <a name="versions"></a> Versions
 
-The most up-to-date version provided here is for Revit 2019/2020.
+The most up-to-date version provided here is for Revit 2019.
 
 
 ## Install
