@@ -6,7 +6,7 @@
 
 Latest Notes(5/12/2024):  
 
-This project consists of two sub-projects:   
+This project consists of two independent sub-projects:   
 1. Get some window data from the Revit file(corresponding to folder Data converting and Room finding).  
 2. Get more kinds of data from the Revit file and compute an escape route(corresponding to folder Rescue and Path finding).  
   
