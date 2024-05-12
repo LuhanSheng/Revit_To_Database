@@ -4,7 +4,8 @@
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgray.svg)
 ![.NET](https://img.shields.io/badge/.NET-4.7-blue.svg)
 
-Latest Note(5/12/2024):  
+Latest Notes(5/12/2024):  
+
 This project consists of two sub-projects:   
 1. Get some window data from the Revit file(corresponding to folder Data converting and Room finding).  
 2. Get more kinds of data from the Revit file and compute an escape route(corresponding to folder Rescue and Path finding).  
