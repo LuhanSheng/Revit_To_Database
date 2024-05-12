@@ -4,6 +4,18 @@
 ![Platform](https://img.shields.io/badge/platform-Windows-lightgray.svg)
 ![.NET](https://img.shields.io/badge/.NET-4.7-blue.svg)
 
+Latest Note(5/12/2024):  
+This project consists of two sub-projects:   
+1. Get some window data from the Revit file(corresponding to folder Data converting and Room finding).  
+2. Get more data from the Revit file and compute an escape route(corresponding to folder Rescue and Path finding).  
+  
+The first step of these two projects is the same: using the same way to get the data from the Revit file.  
+Due to some authorization problems, the Autodesk team removed and modified some code in the first sub-project, so basically, it can not be run as mentioned in the tech report.  
+
+However, the second project remains the same and should be working correctly.  
+You can try to run the second project as their basic structure is almost the same, the difference is that the second sub-project has several more steps that will not directly store the data we get but will do some computations and then store it as we mentioned(so it is more complicated than the first one and I think you will probably get some inspiration).  
+
+--------------------------------------------------------------------------------------  
 Revit secondary development project.  
 Using Revit Files to Identify the Location of Fire Danger and Escape Routes.  
 Under the guidance of Prof. Dennis Shasha.  
