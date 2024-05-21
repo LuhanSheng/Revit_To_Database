@@ -11,9 +11,9 @@ This project consists of two independent sub-projects:
 2. Get more kinds of data from the Revit file and compute an escape route(corresponding to folder Rescue and Path finding).  
   
 The first step of these two projects is the same: using the same way to get the data from the Revit file.  
-Due to authorization problems, the Autodesk team removed and modified some code in the first sub-project. So basically, the first sub-project(get window data) can not be run as mentioned in the tech report.  
+Due to authorization problems, the Autodesk team removed and modified some code in the first sub-project. So, the first sub-project(get window data) can not be run as mentioned in the tech report.  
 
-However, the second sub-project remains the same and should be working correctly.  
+The second sub-project remains the same and should be working correctly.  
 You can try to run the second project as their basic structure is almost the same, the difference is that the second sub-project has several more steps that will not directly store the data we get but will do some more computations and then store it as we mentioned(so it is more complicated than the first one and I think you will probably get some inspiration).  
 
 If you still would like to run the first sub-project, please let me know.
